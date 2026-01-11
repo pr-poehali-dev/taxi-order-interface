@@ -68,9 +68,9 @@ export default function Index() {
   ];
 
   const tariffs = [
-    { id: 'economy', name: 'Эконом', price: '~350₽', time: '5 мин', icon: 'Car' },
-    { id: 'comfort', name: 'Комфорт', price: '~550₽', time: '7 мин', icon: 'CarFront' },
-    { id: 'business', name: 'Бизнес', price: '~850₽', time: '10 мин', icon: 'Gem' }
+    { id: 'economy', name: 'Эконом', price: '~350₽', time: '5 мин', icon: 'Car', color: 'bg-green-500' },
+    { id: 'comfort', name: 'Комфорт', price: '~550₽', time: '7 мин', icon: 'CarFront', color: 'bg-purple-500' },
+    { id: 'business', name: 'Бизнес', price: '~850₽', time: '10 мин', icon: 'Gem', color: 'bg-amber-500' }
   ];
 
   const taxiCars: TaxiCar[] = [
@@ -88,15 +88,15 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-screen flex flex-col">
         <div className="flex-1 overflow-auto">
           <TabsContent value="map" className="h-full m-0 p-0">
             <div className="relative h-full">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
                 <div className="relative w-full h-full">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
                       <Icon name="MapPin" className="text-white" size={32} />
                     </div>
                   </div>
@@ -111,14 +111,14 @@ export default function Index() {
                         animationDelay: `${index * 0.1}s`
                       }}
                     >
-                      <Icon name="Car" className="text-primary" size={20} />
+                      <Icon name="Car" className="text-purple-600" size={20} />
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="absolute top-6 left-0 right-0 px-4 z-10 animate-fade-in">
-                <Card className="p-4 shadow-xl border-0">
+                <Card className="p-4 shadow-xl border-0 bg-white/95 backdrop-blur">
                   <div className="space-y-3">
                     <div className="relative">
                       <Icon name="MapPin" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -130,7 +130,7 @@ export default function Index() {
                       />
                     </div>
                     <div className="relative">
-                      <Icon name="Flag" className="absolute left-3 top-1/2 -translate-y-1/2 text-primary" size={20} />
+                      <Icon name="Flag" className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-500" size={20} />
                       <Input
                         placeholder="Куда"
                         value={to}
@@ -143,7 +143,7 @@ export default function Index() {
               </div>
 
               <div className="absolute bottom-24 left-0 right-0 px-4 z-10 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <Card className="p-4 shadow-xl border-0">
+                <Card className="p-4 shadow-xl border-0 bg-white/95 backdrop-blur">
                   <h3 className="font-semibold text-sm text-gray-600 mb-3">Выберите тариф</h3>
                   <div className="space-y-2">
                     {tariffs.map((tariff) => (
@@ -152,13 +152,13 @@ export default function Index() {
                         onClick={() => setSelectedTariff(tariff.id)}
                         className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
                           selectedTariff === tariff.id
-                            ? 'border-primary bg-primary/5'
+                            ? `border-${tariff.id === 'economy' ? 'green' : tariff.id === 'comfort' ? 'purple' : 'amber'}-500 bg-${tariff.id === 'economy' ? 'green' : tariff.id === 'comfort' ? 'purple' : 'amber'}-50`
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            selectedTariff === tariff.id ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+                            selectedTariff === tariff.id ? `${tariff.color} text-white` : 'bg-gray-100 text-gray-600'
                           }`}>
                             <Icon name={tariff.icon as any} size={20} />
                           </div>
@@ -173,7 +173,7 @@ export default function Index() {
                   </div>
                   <Button 
                     onClick={handleOrderTaxi}
-                    className="w-full mt-4 h-12 text-base font-semibold"
+                    className="w-full mt-4 h-12 text-base font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                     disabled={!from || !to}
                   >
                     Заказать такси
@@ -198,11 +198,11 @@ export default function Index() {
                       <span className="font-medium">{trip.from}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Icon name="Flag" size={16} className="text-primary" />
+                      <Icon name="Flag" size={16} className="text-pink-500" />
                       <span className="font-medium">{trip.to}</span>
                     </div>
                   </div>
-                  <Badge variant={trip.status === 'completed' ? 'default' : 'secondary'}>
+                  <Badge className={trip.status === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}>
                     {trip.status === 'completed' ? 'Завершена' : 'Отменена'}
                   </Badge>
                 </div>
@@ -234,7 +234,7 @@ export default function Index() {
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-6 mt-4">
                 <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarFallback className="bg-primary text-white text-2xl">АС</AvatarFallback>
+                  <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white text-2xl">АС</AvatarFallback>
                 </Avatar>
                 <h2 className="text-2xl font-bold">Алексей Смирнов</h2>
                 <p className="text-gray-600">+7 (900) 123-45-67</p>
@@ -244,8 +244,8 @@ export default function Index() {
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Icon name="Wallet" className="text-primary" size={20} />
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <Icon name="Wallet" className="text-green-600" size={20} />
                       </div>
                       <div>
                         <div className="font-semibold">Баланс</div>
@@ -259,8 +259,8 @@ export default function Index() {
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Icon name="Star" className="text-primary" size={20} />
+                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                        <Icon name="Star" className="text-amber-600" size={20} />
                       </div>
                       <div>
                         <div className="font-semibold">Рейтинг</div>
