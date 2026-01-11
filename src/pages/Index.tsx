@@ -17,12 +17,25 @@ interface Trip {
   status: 'completed' | 'cancelled';
   driver: string;
   carModel: string;
+  distance: string;
+  duration: string;
+  rating: number;
+  paymentMethod: string;
 }
 
 interface TaxiCar {
   id: string;
   lat: number;
   lng: number;
+}
+
+interface Driver {
+  name: string;
+  rating: number;
+  trips: number;
+  carModel: string;
+  carNumber: string;
+  carColor: string;
 }
 
 export default function Index() {
@@ -41,7 +54,11 @@ export default function Index() {
       price: 1250,
       status: 'completed',
       driver: 'Иван П.',
-      carModel: 'Toyota Camry'
+      carModel: 'Toyota Camry',
+      distance: '42.5 км',
+      duration: '45 мин',
+      rating: 5,
+      paymentMethod: 'Карта •••• 4242'
     },
     {
       id: '2',
@@ -52,7 +69,11 @@ export default function Index() {
       price: 450,
       status: 'completed',
       driver: 'Сергей М.',
-      carModel: 'Kia Rio'
+      carModel: 'Kia Rio',
+      distance: '8.2 км',
+      duration: '18 мин',
+      rating: 4,
+      paymentMethod: 'Наличные'
     },
     {
       id: '3',
@@ -63,14 +84,18 @@ export default function Index() {
       price: 380,
       status: 'cancelled',
       driver: 'Андрей К.',
-      carModel: 'Hyundai Solaris'
+      carModel: 'Hyundai Solaris',
+      distance: '6.5 км',
+      duration: '15 мин',
+      rating: 0,
+      paymentMethod: 'Карта •••• 1234'
     }
   ];
 
   const tariffs = [
-    { id: 'economy', name: 'Эконом', price: '~350₽', time: '5 мин', icon: 'Car', color: 'bg-green-500' },
-    { id: 'comfort', name: 'Комфорт', price: '~550₽', time: '7 мин', icon: 'CarFront', color: 'bg-purple-500' },
-    { id: 'business', name: 'Бизнес', price: '~850₽', time: '10 мин', icon: 'Gem', color: 'bg-amber-500' }
+    { id: 'economy', name: 'Эконом', price: '~350₽', time: '5 мин', icon: 'Car', color: 'bg-green-500', description: 'Недорого и быстро', features: ['4 места', 'Кондиционер'] },
+    { id: 'comfort', name: 'Комфорт', price: '~550₽', time: '7 мин', icon: 'CarFront', color: 'bg-purple-500', description: 'Просторный салон', features: ['4 места', 'Премиум авто', 'Wi-Fi'] },
+    { id: 'business', name: 'Бизнес', price: '~850₽', time: '10 мин', icon: 'Gem', color: 'bg-amber-500', description: 'Премиум-класс', features: ['3 места', 'Люкс авто', 'Вода', 'Wi-Fi'] }
   ];
 
   const taxiCars: TaxiCar[] = [
@@ -104,14 +129,19 @@ export default function Index() {
                   {taxiCars.map((car, index) => (
                     <div
                       key={car.id}
-                      className="absolute w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md animate-fade-in"
+                      className="absolute animate-fade-in"
                       style={{
                         left: `${20 + index * 15}%`,
                         top: `${30 + (index % 3) * 20}%`,
                         animationDelay: `${index * 0.1}s`
                       }}
                     >
-                      <Icon name="Car" className="text-purple-600" size={20} />
+                      <div className="relative">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
+                          <Icon name="Car" className="text-purple-600" size={20} />
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -119,6 +149,13 @@ export default function Index() {
 
               <div className="absolute top-6 left-0 right-0 px-4 z-10 animate-fade-in">
                 <Card className="p-4 shadow-xl border-0 bg-white/95 backdrop-blur">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-lg">Куда едем?</h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Icon name="MapPin" size={16} className="text-purple-500" />
+                      <span>Москва</span>
+                    </div>
+                  </div>
                   <div className="space-y-3">
                     <div className="relative">
                       <Icon name="MapPin" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -162,12 +199,20 @@ export default function Index() {
                           }`}>
                             <Icon name={tariff.icon as any} size={20} />
                           </div>
-                          <div className="text-left">
+                          <div className="text-left flex-1">
                             <div className="font-semibold">{tariff.name}</div>
-                            <div className="text-sm text-gray-500">{tariff.time}</div>
+                            <div className="text-xs text-gray-500">{tariff.description}</div>
+                            <div className="flex gap-2 mt-1 flex-wrap">
+                              {tariff.features.map((feature, idx) => (
+                                <span key={idx} className="text-xs bg-gray-100 px-2 py-0.5 rounded">{feature}</span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div className="font-bold text-lg">{tariff.price}</div>
+                        <div className="text-right ml-3">
+                          <div className="font-bold text-lg">{tariff.price}</div>
+                          <div className="text-xs text-gray-500">{tariff.time}</div>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -206,26 +251,51 @@ export default function Index() {
                     {trip.status === 'completed' ? 'Завершена' : 'Отменена'}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between text-sm text-gray-600 pt-3 border-t">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">
-                      <Icon name="Calendar" size={14} />
-                      {trip.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Icon name="Clock" size={14} />
-                      {trip.time}
-                    </span>
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Icon name="Calendar" size={14} />
+                    <span>{trip.date}</span>
                   </div>
-                  <span className="font-bold text-base text-foreground">{trip.price}₽</span>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Icon name="Clock" size={14} />
+                    <span>{trip.time}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Icon name="Navigation" size={14} />
+                    <span>{trip.distance}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Icon name="Timer" size={14} />
+                    <span>{trip.duration}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t text-sm text-gray-600">
-                  <Icon name="User" size={14} />
-                  <span>{trip.driver}</span>
-                  <span className="text-gray-400">•</span>
-                  <Icon name="Car" size={14} />
-                  <span>{trip.carModel}</span>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Icon name="User" size={14} />
+                    <span>{trip.driver}</span>
+                    <span className="text-gray-400">•</span>
+                    <Icon name="Car" size={14} />
+                    <span>{trip.carModel}</span>
+                  </div>
+                  <span className="font-bold text-lg text-foreground">{trip.price}₽</span>
                 </div>
+                {trip.status === 'completed' && trip.rating > 0 && (
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Icon 
+                          key={i} 
+                          name="Star" 
+                          size={14} 
+                          className={i < trip.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">•</span>
+                    <Icon name="CreditCard" size={14} className="text-gray-600" />
+                    <span className="text-sm text-gray-600">{trip.paymentMethod}</span>
+                  </div>
+                )}
               </Card>
             ))}
           </TabsContent>
@@ -240,36 +310,49 @@ export default function Index() {
                 <p className="text-gray-600">+7 (900) 123-45-67</p>
               </div>
 
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <Card className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <Icon name="Wallet" className="text-green-600" size={20} />
-                      </div>
-                      <div>
-                        <div className="font-semibold">Баланс</div>
-                        <div className="text-sm text-gray-600">Личный счёт</div>
-                      </div>
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                      <Icon name="Wallet" className="text-green-600" size={24} />
                     </div>
-                    <div className="text-xl font-bold">1,250₽</div>
+                    <div className="text-2xl font-bold mb-1">1,250₽</div>
+                    <div className="text-sm text-gray-600">Баланс</div>
                   </div>
                 </Card>
 
                 <Card className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                        <Icon name="Star" className="text-amber-600" size={20} />
-                      </div>
-                      <div>
-                        <div className="font-semibold">Рейтинг</div>
-                        <div className="text-sm text-gray-600">Ваша оценка</div>
-                      </div>
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-2">
+                      <Icon name="Star" className="text-amber-600" size={24} />
                     </div>
-                    <div className="text-xl font-bold">4.8</div>
+                    <div className="text-2xl font-bold mb-1">4.8</div>
+                    <div className="text-sm text-gray-600">Рейтинг</div>
                   </div>
                 </Card>
+
+                <Card className="p-4">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                      <Icon name="Route" className="text-purple-600" size={24} />
+                    </div>
+                    <div className="text-2xl font-bold mb-1">127</div>
+                    <div className="text-sm text-gray-600">Поездок</div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                      <Icon name="Award" className="text-blue-600" size={24} />
+                    </div>
+                    <div className="text-2xl font-bold mb-1">15%</div>
+                    <div className="text-sm text-gray-600">Скидка</div>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="space-y-3">
 
                 <Card className="p-4">
                   <button className="w-full flex items-center justify-between hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
